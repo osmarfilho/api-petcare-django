@@ -5,15 +5,14 @@ class BaseManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_active=True)
 
-# BaseModel com Soft Delete e Manager customizado
+
 class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
-    # 2. Associe o manager ao modelo
-    objects = BaseManager() # O manager padrão agora só retorna ativos
-    all_objects = models.Manager() # Um manager que retorna TODOS os objetos
+    objects = BaseManager()
+    all_objects = models.Manager() 
 
     class Meta:
         abstract = True
@@ -21,13 +20,9 @@ class BaseModel(models.Model):
     def delete(self, using=None, keep_parents=False):
         self.is_active = False
         self.save()
-
-# ... Seus outros modelos (ONG, Animal, ConsultaVeterinaria) ficam exatamente como estão ...
-# Eles herdarão automaticamente os novos managers!
-
-# Modelo ONG
+ 
 class ONG(BaseModel):
-    # ... (sem alterações)
+   
     nome = models.CharField(max_length=100)
     endereco = models.CharField(max_length=200)
     contato = models.CharField(max_length=50)
@@ -64,9 +59,7 @@ class Animal(BaseModel):
         verbose_name_plural = "Animais"
 
 
-# Modelo Consulta Veterinária
 class ConsultaVeterinaria(BaseModel):
-    # ... (sem alterações)
     animal = models.ForeignKey(Animal, on_delete=models.CASCADE, related_name="consultas")
     data = models.DateTimeField()
     veterinario = models.CharField(max_length=100)
